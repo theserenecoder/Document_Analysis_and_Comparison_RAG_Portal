@@ -3,5 +3,11 @@ python-dotenv
 langchain-openai
 langchain-groq
 langchain_google_genai
+langchain-community
+langchain-core
+pypdf
+faiss-cpu
+structlog
+PyMuPDF
 
 -e .
