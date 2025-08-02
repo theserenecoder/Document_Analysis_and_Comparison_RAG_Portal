@@ -2,8 +2,8 @@ import logging
 import os
 from datetime import datetime
 class CustomLogger:
-    
     def __init__(self, log_dir = 'logs'):
+        ## insures logs directory exists
         self.logs_dir = os.path.join(os.getcwd(),log_dir)
         ## creating the directory, if exists will use that
         os.makedirs(self.logs_dir, exist_ok=True)
