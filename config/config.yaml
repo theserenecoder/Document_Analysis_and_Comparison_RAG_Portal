@@ -10,11 +10,13 @@ retriever:
 
 llm:
   openai:
+    provider: "openai"
     model_name: "gpt-4o-mini"
     temperature: 0.0
     max_output_tokens: 4096
 
   google:
+    provider: "google"
     model_name: "gemini-1.5-flash"
     temperature: 0.0
     max_output_tokens: 4096
