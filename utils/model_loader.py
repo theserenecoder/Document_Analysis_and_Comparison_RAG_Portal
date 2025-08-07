@@ -10,19 +10,20 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from langchain_groq import ChatGroq
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
-log = CustomLogger().get_logger(__name__)
+
 
 class ModelLoader():
     def __init__(self):
         """A utility class to load embedding models and LLM models.
         """
+        self.log = CustomLogger().get_logger(__name__)
         load_dotenv()
         ## check that environment variables are loaded
         self._validate_env()
         ## loading all the config
         self.config = load_config()
         ## logging success
-        log.info("Configuration loaded successfully", config_keys=list(self.config.keys()))
+        self.log.info("Configuration loaded successfully", config_keys=list(self.config.keys()))
     
     def _validate_env(self):
         '''A function to validate environment variable and ensures API key exists'''
@@ -34,18 +35,18 @@ class ModelLoader():
         missing = [k for k,v in self.api_keys.items() if not v]
         ## if any api key is missing will log and raise the custom exception
         if missing:
-            log.error("Missing environmentvariables", missing_vars = missing)
+            self.log.error("Missing environmentvariables", missing_vars = missing)
             raise DocumentPortalException("Missing environment variables", sys)
-        log.info("Environment variables validated", available_keys=[k for k in self.api_keys if self.api_keys[k]])
+        self.log.info("Environment variables validated", available_keys=[k for k in self.api_keys if self.api_keys[k]])
     
     def load_embedding_model(self):
         '''Load and return embedding model'''
         try:
-            log.info('Loading the embedding model...')
+            self.log.info('Loading the embedding model...')
             model_name = self.config['embedding_model']['model_name']
             return OpenAIEmbeddings(model=model_name)
         except Exception as e:
-            log.error('Error loading embedding model', error=str(e))
+            self.log.error('Error loading embedding model', error=str(e))
             raise DocumentPortalException('Failed to load embedding model',sys)
     
     def load_llm(self):
@@ -53,13 +54,13 @@ class ModelLoader():
         ## loading the complete llm block from yaml file
         llm_block = self.config['llm']
         
-        log.info("Loading LLM...")
+        self.log.info("Loading LLM...")
         
         ## If we have defined the LLM provider it will take that else it will take google
         provider_key = os.getenv('LLM_PROVIDER','openai')
         
         if provider_key not in llm_block:
-            log.error('LLM provider not found in config', provider_key = provider_key)
+            self.log.error('LLM provider not found in config', provider_key = provider_key)
             raise ValueError(f"Provider '{provider_key}' not found in cofig")
         
         llm_config = llm_block[provider_key]
@@ -68,7 +69,7 @@ class ModelLoader():
         temperature = llm_config.get('temperature')
         max_tokens = llm_config.get('max_output_tokens')
         
-        log.info("Loading LLM", provider=provider,model_name=model_name, temperature=temperature, max_tokens= max_tokens)
+        self.log.info("Loading LLM", provider=provider,model_name=model_name, temperature=temperature, max_tokens= max_tokens)
         
         if provider == 'openai':
             llm = ChatOpenAI(
@@ -87,7 +88,7 @@ class ModelLoader():
             return llm
         
         else:
-            log.error("Unsupported LLM provider", provider = provider)
+            self.log.error("Unsupported LLM provider", provider = provider)
             raise ValueError(f'Unsupported LLM Provider : {provider}')
         
 
@@ -100,9 +101,9 @@ if __name__=='__main__':
     print(f"Embedding model Loaded : {embeddings}")
     
     ## test the model loader
-    result = embeddings.embed_query("Hello how are you")
-    print("\n")
-    print(f"Embedding result: {result}")
+    # result = embeddings.embed_query("Hello how are you")
+    # print("\n")
+    # print(f"Embedding result: {result}")
     
     ## test the llm loader
     llm = loader.load_llm()

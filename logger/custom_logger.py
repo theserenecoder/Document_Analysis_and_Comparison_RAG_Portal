@@ -10,7 +10,7 @@ class CustomLogger:
         os.makedirs(self.logs_dir, exist_ok=True)
         
         ## Create timestamped log filename
-        log_file = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S.log')}"
+        log_file = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log"
         self.log_file_path = os.path.join(self.logs_dir, log_file)
         
         
@@ -29,8 +29,8 @@ class CustomLogger:
         
         ## Configure Logging
         logging.basicConfig(
-            format="%(message)s", # Structlog will handle JSON rendering
             level=logging.INFO,
+            format="%(message)s", # Structlog will handle JSON rendering
             handlers=[consol_handler,file_handler]
         )
         
