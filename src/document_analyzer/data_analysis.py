@@ -51,7 +51,7 @@ class DocumentAnalyzer:
             self.log.info("Metadata extraction successful", keys = list(response.keys()))
             
             return response
-            pass
+            
         except Exception as e:
             self.log.error("Metadata analysis Failed: {e}")
             raise DocumentAnalyzer("Metadata analysis Failed",e)
