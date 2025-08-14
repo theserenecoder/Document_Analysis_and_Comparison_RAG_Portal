@@ -8,6 +8,7 @@ from prompts.prompt_library import PROMPT_REGISTRY
 from utils.model_loader import ModelLoader
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import OutputFixingParser
+import pandas as pd
 
 
 class DocumentComparerLLM:
@@ -23,22 +24,36 @@ class DocumentComparerLLM:
         self.chain = self.prompt | self.llm | self.parser | self.fixing_parser
         self.log.info("Document Comparer LLM initialized with model and parser")
     
-    def compare_documents(self):
+    def compare_documents(self, combined_docs: str) -> pd.DataFrame:
         '''
         Compares two documents and returns a structured comparision.
         '''
         try:
-            pass
+            inputs = {
+                "combined_documents" : combined_docs,
+                "format_instruction" : self.parser.get_format_instructions()
+            }
+            self.log.info("Starting document comparision", inputs=inputs)
+            
+            response = self.chain.invoke(inputs)
+            self.log.info("Document comparision completed", response=response)
+            
+            return self._format_response(response)
+        
         except Exception as e:
             self.log.error(f"Error in compare_documents: {e}")
             raise DocumentPortalException("An error occured while comparing documents.", sys)
     
-    def _format_response(self):
+    def _format_response(self,response_parsed:list[dict])->pd.DataFrame:
         '''
         Format the response from the LLM into a structured format.
         '''
         try:
-            pass
+            ## converting response into dataframe
+            df = pd.DataFrame(response_parsed)
+            self.log.info("Response formatted into Dataframe", dataframe=df)
+            return df
+            
         except Exception as e:
             self.log.error(f"Error formatting response into DataFrame", error=str(e))
             raise DocumentPortalException("Error formatting response.",sys)

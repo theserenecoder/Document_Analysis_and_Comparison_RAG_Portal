@@ -4,7 +4,7 @@ import fitz
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
-class DocumentComparer:
+class DocumentIngestion:
     
     def __init__(self, base_dir):
         ## Initializing our custom logger
@@ -64,7 +64,7 @@ class DocumentComparer:
             
         except Exception as e:
             self.log.error(f"Error saving uploaded file: {e}")
-            raise DocumentComparer("An error occured while saving the uploaded file.",sys)
+            raise DocumentPortalException("An error occured while saving the uploaded file.",sys)
     
     def read_pdf(self, pdf_path:Path)->str:
         try:
@@ -89,4 +89,4 @@ class DocumentComparer:
                 
         except Exception as e:
             self.log.error(f"Error reading files: {e}")
-            raise DocumentComparer("An error ocurred while reading the files.",sys)
+            raise DocumentPortalException("An error ocurred while reading the files.",sys)
