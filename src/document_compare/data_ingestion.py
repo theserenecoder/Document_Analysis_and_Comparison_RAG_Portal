@@ -88,5 +88,28 @@ class DocumentIngestion:
             return "\n".join(all_text)
                 
         except Exception as e:
-            self.log.error(f"Error reading files: {e}")
-            raise DocumentPortalException("An error ocurred while reading the files.",sys)
+            self.log.error(f"Error reading PDFs: {e}")
+            raise DocumentPortalException("An error ocurred while reading the PDFs.",sys)
+        
+    def combine_document(self) ->str:
+        try:
+            content_dict = {}
+            doc_parts = []
+            
+            ## iterating over files and storing them as dict
+            for filename in sorted(self.base_dir.iterdir()):
+                if filename.is_file() and filename.suffix ==".pdf":
+                    content_dict[filename.name] = self.read_pdf(filename)
+            ## saving the filename and content as list      
+            for file, content in content_dict.items():
+                doc_parts.append(f"Document: {file}\n{content}")
+            
+            ## combining the files
+            combine_text = "\n\n".join(doc_parts)
+            self.log.info("Document Combined", count = len(doc_parts))
+            
+            return combine_text
+            
+        except Exception as e:
+            self.log.error(f"Error combining documents: {e}")
+            raise DocumentPortalException("An error ocurred while combining the documents.",sys)
