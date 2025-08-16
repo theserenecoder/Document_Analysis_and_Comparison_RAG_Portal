@@ -6,7 +6,7 @@ from exception.custom_exception import DocumentPortalException
 
 class DocumentIngestion:
     
-    def __init__(self, base_dir):
+    def __init__(self, base_dir: str="data\\document_compare"):
         ## Initializing our custom logger
         self.log = CustomLogger().get_logger(__name__)
         ## creating path of our directory
@@ -45,7 +45,7 @@ class DocumentIngestion:
             ## updated file
             ref_path =self.base_dir/reference_file.name
             ## original file
-            act_path = self.base_dir/reference_file.name
+            act_path = self.base_dir/actual_file.name
             
             ## raise value error if not pf file
             if not reference_file.name.endswith(".pdf") or not actual_file.name.endswith(".pdf"):
@@ -60,7 +60,7 @@ class DocumentIngestion:
                 
             self.log.info(f"Files saved.", reference=str(ref_path), actual=str(act_path))
                 
-            
+            return ref_path, act_path
             
         except Exception as e:
             self.log.error(f"Error saving uploaded file: {e}")
@@ -91,7 +91,7 @@ class DocumentIngestion:
             self.log.error(f"Error reading PDFs: {e}")
             raise DocumentPortalException("An error ocurred while reading the PDFs.",sys)
         
-    def combine_document(self) ->str:
+    def combine_documents(self) ->str:
         try:
             content_dict = {}
             doc_parts = []
