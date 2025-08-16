@@ -15,13 +15,20 @@ class DocumentComparerLLM:
     
     def __init__(self):
         load_dotenv()
+        ## initializing custom logger
         self.log = CustomLogger().get_logger(__file__)
+        ## initializing model
         self.loader = ModelLoader()
+        ## loading model
         self.llm = self.loader.load_llm()
+        ## Output parser
         self.parser = JsonOutputParser(pydantic_object=SummaryResponse)
         self.fixing_parser = OutputFixingParser.from_llm(parser=self.parser, llm = self.llm)
+        ## Loading Prompt
         self.prompt = PROMPT_REGISTRY['document_comparision']
+        ## Defining the chain
         self.chain = self.prompt | self.llm | self.parser 
+        ## logging success
         self.log.info("\nDocument Comparer LLM initialized with model and parser", model=self.llm)
     
     def compare_documents(self, combined_docs: str) -> pd.DataFrame:
@@ -41,7 +48,7 @@ class DocumentComparerLLM:
             return self._format_response(response)
         
         except Exception as e:
-            self.log.error(f"Error in compare_documents: {e}")
+            self.log.error(f"Error in compare_documents", error=str(e))
             raise DocumentPortalException("An error occured while comparing documents.", sys)
     
     def _format_response(self,response_parsed:list[dict])->pd.DataFrame:

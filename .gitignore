@@ -8,3 +8,4 @@ __pycache__/
 test.py
 logs
 data/
+data/document_compare/attention.pdf
