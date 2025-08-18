@@ -20,7 +20,7 @@ from model.models import PromptType
 class ConversationalRAG:
     def __init__(self, session_id: str, retriever) ->None:
         try:
-            self.log = CustomLogger().get_logger()
+            self.log = CustomLogger().get_logger(__name__)
             ## session id
             self.session_id = session_id
             ## retriever
@@ -54,7 +54,7 @@ class ConversationalRAG:
                 output_messages_key="answer"
             )
             ## logging
-            self.log.info("Created RunnableWithMessageHistory",session_id=session_id)
+            self.log.info("Wrapped chain with message history",session_id=session_id)
             
             
         except Exception as e:
@@ -72,9 +72,17 @@ class ConversationalRAG:
             self.log.error("Error loading LLM via ModelLoader", error=str(e))
             raise DocumentPortalException("Failed to load llm", sys)
         
-    def _get_session_history(self, session_id:str):
+    def _get_session_history(self, session_id:str) -> BaseChatMessageHistory:
         try:
-            pass
+            if "store" not in st.session_state:
+                st.session_state.store = {}
+                
+            if session_id not in st.session_state.store:
+                st.session_state.store[session_id]  = ChatMessageHistory()
+                self.log.info("New chat session history created", session_id=session_id)
+                
+            return st.session_state.store[session_id]
+                
         except Exception as e:
             self.log.error("Failed to access session history", error=str(e), session_id=session_id)
             raise DocumentPortalException("Failed to retrieve session history", sys)
@@ -100,10 +108,14 @@ class ConversationalRAG:
     def invoke(self, user_input:str)->str:
         try:
             ## invoking the chain
+            print("\nInside invoke retreiver\n")
+            
             response = self.chain.invoke(
-                {"input":user_input},
+                {"input": user_input},
                 config={"configurable":{"session_id":self.session_id}}
             )
+            
+            print('\nChecking Response')
             ## getting the response
             answer = response.get("answer", "No answer")
             ## if response is empty log warning

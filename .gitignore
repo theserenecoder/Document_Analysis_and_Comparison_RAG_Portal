@@ -9,3 +9,4 @@ test.py
 logs
 data/
 data/document_compare/attention.pdf
+faiss_index

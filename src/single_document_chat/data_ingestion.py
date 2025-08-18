@@ -13,7 +13,7 @@ import uuid
 class SingleDocIngestor:
     def __init__(self,data_dir:str = "data/single_document_chat", faiss_dir:str = "faiss_index"):
         try:
-            self.log = CustomLogger().get_logger()
+            self.log = CustomLogger().get_logger(__name__)
             ## defining data directory path
             self.data_dir = Path(data_dir)
             ## when parent =True it will create parent directories as well if missing
@@ -37,7 +37,7 @@ class SingleDocIngestor:
             ## loading uploaded file
             for uploaded_file in uploaded_files:
                 ## defining a random file name
-                unique_filename = f"session_{datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")}_{uuid.uuid4().hex[:8]}.pdf"
+                unique_filename = f"session_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.pdf"
                 ## defining a temp file path
                 temp_path = self.data_dir/unique_filename
                 ## writing the file at temp path
@@ -46,7 +46,7 @@ class SingleDocIngestor:
                 self.log.info("PDF saved for ingestion", filename = uploaded_file.name)
                 
                 ## load the file
-                loader = PyPDFLoader(temp_path)
+                loader = PyPDFLoader(str(temp_path))
                 docs = loader.load()
                 ## appending the file in document list
                 documents.extend(docs)
@@ -78,7 +78,7 @@ class SingleDocIngestor:
             )
             
             ## save FAISS index
-            vector_store.save_local(self.faiss_dir)
+            vector_store.save_local(str(self.faiss_dir))
             ## logging
             self.log.info("FAISS vector store created and saved", faiss_path = str(self.faiss_dir))
             

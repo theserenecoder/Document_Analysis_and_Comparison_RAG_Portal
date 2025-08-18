@@ -25,11 +25,11 @@ class DocumentPortalException(Exception):
         
 if __name__ == "__main__":
     try:
-        logger = CustomLogger().get_logger(__file__)
+        # logger = CustomLogger().get_logger(__file__)
         # Simulate an error
         a = 1 / 0
         print(a)
     except Exception as e:
         app_exc=DocumentPortalException(e,sys)
-        logger.error(app_exc)
+        # logger.error(app_exc)
         raise app_exc
