@@ -8,7 +8,6 @@ from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 from utils.model_loader import ModelLoader
 from datetime import datetime, timezone
-import uuid
 
 class SingleDocIngestor:
     def __init__(self,data_dir:str = "data/single_document_chat", faiss_dir:str = "faiss_index"):
