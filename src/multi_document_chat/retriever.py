@@ -2,6 +2,7 @@ import os
 import sys
 from operator import itemgetter
 import streamlit as st
+from typing import Optional, List
 
 from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -25,8 +26,8 @@ class ConversationRAG:
             ## llm
             self.llm = self._load_llm()
             ## Prompt
-            self.contextualize_prompt = PROMPT_REGISTRY(PromptType.CONTEXTUALIZE_QUESTION.value)
-            self.qa_prompt = PROMPT_REGISTRY(PromptType.CONTEXT_QA.value)
+            self.contextualize_prompt = PROMPT_REGISTRY[PromptType.CONTEXTUALIZE_QUESTION.value]
+            self.qa_prompt = PROMPT_REGISTRY[PromptType.CONTEXT_QA.value]
             ## loading retriever
             if retriever is None:
                 raise ValueError("Retriever is None")
@@ -55,17 +56,33 @@ class ConversationRAG:
             self.retriever = vectore_store.as_retriever(search_type ='similarity', search_kwargs={"k":5})
             self.log.info("Loaded retriever from FAISS index", index_path=index_path)
             
-            self._build_lcel_chain()
-            
             return self.retriever
             
         except Exception as e:
             self.log.error("Failed to load retriever from FAISS", error=str(e))
             raise DocumentPortalException("Loading error in CoversationalRag",sys)
         
-    def invoke(self):
+    def invoke(self, user_input: str, chat_history:Optional[List[BaseMessage]]=None)->None:
+        """Invoke the retriver
+        """
         try:
-            pass
+            chat_history = chat_history or []
+            payload = {"input":user_input, "chat_history":chat_history}
+            answer = self.chain.invoke(payload)
+            
+            if not answer:
+                self.log.warning("No answer generated", user_input = user_input, session_id = self.session_id)
+                return "no answer generated"
+            
+            self.log.info(
+                "Chain invoked successfully",
+                session_id = self.session_id,
+                user_input = user_input,
+                answer_preview = answer[:150]
+            )
+            
+            return answer
+            
         except Exception as e:
             self.log.error("Failed to invoke CoversationalRag", error=str(e))
             raise DocumentPortalException("Invocation error in CoversationalRag",sys)

@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 from datetime import datetime, timezone
 
-from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader, Mar
+from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from logger.custom_logger import CustomLogger
@@ -37,7 +37,7 @@ class DocumentIngestor:
             self.session_faiss_dir.mkdir(parents=True,exist_ok=True)
             
             ## loading model
-            self.model_loder = ModelLoader()
+            self.model_loader = ModelLoader()
             
             ## logging
             self.log.info(
@@ -62,7 +62,7 @@ class DocumentIngestor:
             ## iterating over all the files
             for uploaded_file in uploaded_files:
                 ## extracting the suffix/extension of the file like .pdf, .txt etc
-                ext = Path(uploaded_files.name).suffix.lower()
+                ext = Path(uploaded_file.name).suffix.lower()
                 ## checking if the extension in supported types
                 if ext not in self.SUPPORTED_EXTENSIONS:
                     self.log.warning("Unsupported file skipped", filename = uploaded_file.name)
